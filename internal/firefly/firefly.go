@@ -1,6 +1,7 @@
 package firefly
 
 import (
+	"bytes"
 	"encoding/json"
 	"ffiibtc/internal/classifier"
 	"ffiibtc/internal/config"
@@ -35,6 +36,23 @@ type apiMeta struct {
 type apiResponse struct {
 	Data []transactionGroup `json:"data"`
 	Meta apiMeta            `json:"meta"`
+}
+
+type WebhookTransaction struct {
+	TransactionJournalID int      `json:"transaction_journal_id"`
+	Description          string   `json:"description"`
+	CategoryName         string   `json:"category_name"`
+	BudgetName           string   `json:"budget_name"`
+	Tags                 []string `json:"tags"`
+}
+
+type WebhookContent struct {
+	ID           int                  `json:"id"`
+	Transactions []WebhookTransaction `json:"transactions"`
+}
+
+type WebhookPayload struct {
+	Content WebhookContent `json:"content"`
 }
 
 type Client struct {
@@ -72,6 +90,52 @@ func (c *Client) FetchTransactions(start, end *time.Time) (classifier.Transactio
 	}
 
 	return dataset, nil
+}
+
+func (c *Client) UpdateTransaction(groupID int, journalID int, budgetName string, tags []string) error {
+	type entry struct {
+		TransactionJournalID int      `json:"transaction_journal_id"`
+		BudgetName           string   `json:"budget_name"`
+		Tags                 []string `json:"tags"`
+	}
+	type reqBody struct {
+		FireWebhooks bool    `json:"fire_webhooks"`
+		Transactions []entry `json:"transactions"`
+	}
+
+	body := reqBody{
+		FireWebhooks: false,
+		Transactions: []entry{{
+			TransactionJournalID: journalID,
+			BudgetName:           budgetName,
+			Tags:                 tags,
+		}},
+	}
+
+	data, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf("%s/api/v1/transactions/%d", c.cfg.FFApp, groupID)
+	req, err := http.NewRequest(http.MethodPatch, url, bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", "Bearer "+c.cfg.APIKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("firefly API returned status %d on update", resp.StatusCode)
+	}
+
+	return nil
 }
 
 func (c *Client) fetchPage(page int, start, end *time.Time) (*apiResponse, error) {
