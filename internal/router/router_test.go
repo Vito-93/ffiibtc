@@ -42,7 +42,7 @@ func TestClassifyEndpointWiredCorrectly(t *testing.T) {
 	cls, err := classifier.NewBudgetClassifierWithTraining(ds)
 	require.NoError(t, err)
 
-	srv := handlers.NewServer(cls, &noopUpdater{})
+	srv := handlers.NewServer(cls, &noopUpdater{}, nil, "")
 
 	r := NewRouter()
 	r.AddRoute("POST /classify", srv.HandleClassify)

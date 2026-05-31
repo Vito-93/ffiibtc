@@ -30,13 +30,14 @@ func main() {
 		l.Logf("FATAL initializing classifier: %v", err)
 	}
 
-	srv := handlers.NewServer(cls, ffClient)
+	srv := handlers.NewServer(cls, ffClient, ffClient, config.ModelFile)
 
 	r := router.NewRouter()
 	r.AddRoute("/health", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
 	r.AddRoute("POST /classify", srv.HandleClassify)
+	r.AddRoute("GET /train", srv.HandleTrain)
 
 	if err := r.Run(8080); err != nil {
 		l.Logf("FATAL server error: %v", err)
