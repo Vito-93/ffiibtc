@@ -54,7 +54,7 @@ func TestClassifyEndpointWiredCorrectly(t *testing.T) {
 		Content: firefly.WebhookContent{
 			ID: 1,
 			Transactions: []firefly.WebhookTransaction{{
-				TransactionJournalID: 10,
+				TransactionJournalID: "10",
 				Description:          "SUPERMERCATO",
 				Tags:                 []string{},
 			}},

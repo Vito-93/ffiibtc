@@ -39,7 +39,7 @@ type apiResponse struct {
 }
 
 type WebhookTransaction struct {
-	TransactionJournalID int      `json:"transaction_journal_id"`
+	TransactionJournalID string   `json:"transaction_journal_id"`
 	Description          string   `json:"description"`
 	CategoryName         string   `json:"category_name"`
 	BudgetName           string   `json:"budget_name"`
@@ -118,7 +118,7 @@ func (c *Client) UpdateTransaction(groupID int, journalID int, budgetName string
 	}
 
 	url := fmt.Sprintf("%s/api/v1/transactions/%d", c.cfg.FFApp, groupID)
-	req, err := http.NewRequest(http.MethodPatch, url, bytes.NewReader(data))
+	req, err := http.NewRequest(http.MethodPut, url, bytes.NewReader(data))
 	if err != nil {
 		return err
 	}

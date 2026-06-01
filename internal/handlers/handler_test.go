@@ -102,7 +102,7 @@ func TestClassifyHandler_SkipsTransactionWithServiceTag(t *testing.T) {
 		Content: firefly.WebhookContent{
 			ID: 1,
 			Transactions: []firefly.WebhookTransaction{{
-				TransactionJournalID: 10,
+				TransactionJournalID: "10",
 				Description:          "SUPERMERCATO COOP",
 				CategoryName:         "Food",
 				BudgetName:           "",
@@ -125,7 +125,7 @@ func TestClassifyHandler_SkipsTransactionWithBudgetAlreadySet(t *testing.T) {
 		Content: firefly.WebhookContent{
 			ID: 2,
 			Transactions: []firefly.WebhookTransaction{{
-				TransactionJournalID: 20,
+				TransactionJournalID: "20",
 				Description:          "SUPERMERCATO COOP",
 				CategoryName:         "Food",
 				BudgetName:           "Needs",
@@ -148,7 +148,7 @@ func TestClassifyHandler_ClassifiesAndUpdatesUnbudgetedTransaction(t *testing.T)
 		Content: firefly.WebhookContent{
 			ID: 3,
 			Transactions: []firefly.WebhookTransaction{{
-				TransactionJournalID: 30,
+				TransactionJournalID: "30",
 				Description:          "SUPERMERCATO COOP",
 				CategoryName:         "Food",
 				BudgetName:           "",
@@ -283,7 +283,7 @@ func classifyDescription(t *testing.T, srv *handlers.Server, updater *fakeUpdate
 		Content: firefly.WebhookContent{
 			ID: 99,
 			Transactions: []firefly.WebhookTransaction{{
-				TransactionJournalID: 99,
+				TransactionJournalID: "99",
 				Description:          description,
 				CategoryName:         category,
 				BudgetName:           "",

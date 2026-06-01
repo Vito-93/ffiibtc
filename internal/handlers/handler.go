@@ -1,13 +1,16 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"ffiibtc/internal/classifier"
 	"ffiibtc/internal/firefly"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"sync/atomic"
 	"time"
 )
@@ -36,8 +39,10 @@ func NewServer(cls *classifier.BudgetClassifier, updater TransactionUpdater, fet
 }
 
 func (s *Server) HandleClassify(w http.ResponseWriter, r *http.Request) {
+	bodyBytes, _ := io.ReadAll(r.Body)
+
 	var payload firefly.WebhookPayload
-	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+	if err := json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&payload); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -62,7 +67,13 @@ func (s *Server) HandleClassify(w http.ResponseWriter, r *http.Request) {
 	budget := s.cls.Load().ClassifyTransaction(tx.Description, tx.CategoryName)
 	newTags := append(tx.Tags, ServiceTag)
 
-	if err := s.Updater.UpdateTransaction(payload.Content.ID, tx.TransactionJournalID, budget, newTags); err != nil {
+	journalID, err := strconv.Atoi(tx.TransactionJournalID)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := s.Updater.UpdateTransaction(payload.Content.ID, journalID, budget, newTags); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
