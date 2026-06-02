@@ -2,8 +2,8 @@ package firefly
 
 import (
 	"encoding/json"
-	"ffiibtc/internal/classifier"
-	"ffiibtc/internal/config"
+	"ffiiibc/internal/classifier"
+	"ffiiibc/internal/config"
 	"net/http"
 	"net/http/httptest"
 	"testing"

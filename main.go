@@ -1,11 +1,11 @@
 package main
 
 import (
-	"ffiibtc/internal/bootstrap"
-	"ffiibtc/internal/config"
-	"ffiibtc/internal/firefly"
-	"ffiibtc/internal/handlers"
-	"ffiibtc/internal/router"
+	"ffiiibc/internal/bootstrap"
+	"ffiiibc/internal/config"
+	"ffiiibc/internal/firefly"
+	"ffiiibc/internal/handlers"
+	"ffiiibc/internal/router"
 	"net/http"
 	"time"
 
@@ -14,7 +14,7 @@ import (
 
 func main() {
 	l := lgr.New(lgr.Debug, lgr.CallerFunc)
-	l.Logf("INFO ffiibtc started")
+	l.Logf("INFO ffiiibc started")
 
 	cfg, err := config.NewConfig(l)
 	if err != nil {
@@ -30,7 +30,7 @@ func main() {
 		l.Logf("FATAL initializing classifier: %v", err)
 	}
 
-	srv := handlers.NewServer(cls, ffClient, ffClient, config.ModelFile)
+	srv := handlers.NewServer(cls, ffClient, ffClient, config.ModelFile, l)
 
 	r := router.NewRouter()
 	r.AddRoute("/health", func(w http.ResponseWriter, _ *http.Request) {

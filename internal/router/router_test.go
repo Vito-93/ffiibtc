@@ -3,9 +3,9 @@ package router
 import (
 	"bytes"
 	"encoding/json"
-	"ffiibtc/internal/classifier"
-	"ffiibtc/internal/firefly"
-	"ffiibtc/internal/handlers"
+	"ffiiibc/internal/classifier"
+	"ffiiibc/internal/firefly"
+	"ffiiibc/internal/handlers"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -42,7 +42,7 @@ func TestClassifyEndpointWiredCorrectly(t *testing.T) {
 	cls, err := classifier.NewBudgetClassifierWithTraining(ds)
 	require.NoError(t, err)
 
-	srv := handlers.NewServer(cls, &noopUpdater{}, nil, "")
+	srv := handlers.NewServer(cls, &noopUpdater{}, nil, "", nil)
 
 	r := NewRouter()
 	r.AddRoute("POST /classify", srv.HandleClassify)

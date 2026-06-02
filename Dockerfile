@@ -7,11 +7,11 @@ RUN go mod download
 RUN go test ./...
 ARG TARGETPLATFORM TARGETARCH TARGETOS
 RUN echo "Building for ${TARGETPLATFORM}..."
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /out/ffiibtc
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /out/ffiiibc
 
 FROM alpine:latest AS release
 WORKDIR /app
 RUN mkdir -p /app/data
-COPY --from=build /out/ffiibtc /app/ffiibtc
+COPY --from=build /out/ffiiibc /app/ffiiibc
 EXPOSE 8080
-ENTRYPOINT ["/app/ffiibtc"]
+ENTRYPOINT ["/app/ffiiibc"]

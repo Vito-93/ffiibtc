@@ -1,7 +1,7 @@
 package bootstrap
 
 import (
-	"ffiibtc/internal/classifier"
+	"ffiiibc/internal/classifier"
 	"os"
 	"path/filepath"
 	"time"

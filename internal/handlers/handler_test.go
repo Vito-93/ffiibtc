@@ -3,9 +3,9 @@ package handlers_test
 import (
 	"bytes"
 	"encoding/json"
-	"ffiibtc/internal/classifier"
-	"ffiibtc/internal/firefly"
-	"ffiibtc/internal/handlers"
+	"ffiiibc/internal/classifier"
+	"ffiiibc/internal/firefly"
+	"ffiiibc/internal/handlers"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -96,7 +96,7 @@ func getTrain(t *testing.T, srv *handlers.Server, query string) *http.Response {
 func TestClassifyHandler_SkipsTransactionWithServiceTag(t *testing.T) {
 	cls := buildTestClassifier(t, mixedDataset)
 	updater := &fakeUpdater{}
-	srv := handlers.NewServer(cls, updater, nil, "")
+	srv := handlers.NewServer(cls, updater, nil, "", nil)
 
 	payload := firefly.WebhookPayload{
 		Content: firefly.WebhookContent{
@@ -119,7 +119,7 @@ func TestClassifyHandler_SkipsTransactionWithServiceTag(t *testing.T) {
 func TestClassifyHandler_SkipsTransactionWithBudgetAlreadySet(t *testing.T) {
 	cls := buildTestClassifier(t, mixedDataset)
 	updater := &fakeUpdater{}
-	srv := handlers.NewServer(cls, updater, nil, "")
+	srv := handlers.NewServer(cls, updater, nil, "", nil)
 
 	payload := firefly.WebhookPayload{
 		Content: firefly.WebhookContent{
@@ -142,7 +142,7 @@ func TestClassifyHandler_SkipsTransactionWithBudgetAlreadySet(t *testing.T) {
 func TestClassifyHandler_ClassifiesAndUpdatesUnbudgetedTransaction(t *testing.T) {
 	cls := buildTestClassifier(t, mixedDataset)
 	updater := &fakeUpdater{}
-	srv := handlers.NewServer(cls, updater, nil, "")
+	srv := handlers.NewServer(cls, updater, nil, "", nil)
 
 	payload := firefly.WebhookPayload{
 		Content: firefly.WebhookContent{
@@ -173,7 +173,7 @@ func TestTrainHandler_Returns200(t *testing.T) {
 	modelFile := filepath.Join(dir, "model.gob")
 	cls := buildTestClassifier(t, mixedDataset)
 	fetcher := &fakeFetcher{dataset: mixedDataset}
-	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile)
+	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile, nil)
 
 	resp := getTrain(t, srv, "")
 
@@ -185,7 +185,7 @@ func TestTrainHandler_PersistsModelToFile(t *testing.T) {
 	modelFile := filepath.Join(dir, "model.gob")
 	cls := buildTestClassifier(t, mixedDataset)
 	fetcher := &fakeFetcher{dataset: mixedDataset}
-	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile)
+	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile, nil)
 
 	getTrain(t, srv, "")
 
@@ -211,7 +211,7 @@ func TestTrainHandler_HotReloadsClassifier(t *testing.T) {
 	}
 	fetcher := &fakeFetcher{dataset: retrainDataset}
 	updater := &fakeUpdater{}
-	srv := handlers.NewServer(cls, updater, fetcher, modelFile)
+	srv := handlers.NewServer(cls, updater, fetcher, modelFile, nil)
 
 	budgetBefore := classifyDescription(t, srv, updater, "NETFLIX", "Entertainment")
 	assert.Equal(t, "Needs", budgetBefore, "initial model should predict Needs for NETFLIX")
@@ -227,7 +227,7 @@ func TestTrainHandler_PassesStartDateToFetcher(t *testing.T) {
 	modelFile := filepath.Join(dir, "model.gob")
 	cls := buildTestClassifier(t, mixedDataset)
 	fetcher := &fakeFetcher{dataset: mixedDataset}
-	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile)
+	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile, nil)
 
 	getTrain(t, srv, "?start=2024-01-15")
 
@@ -241,7 +241,7 @@ func TestTrainHandler_PassesEndDateToFetcher(t *testing.T) {
 	modelFile := filepath.Join(dir, "model.gob")
 	cls := buildTestClassifier(t, mixedDataset)
 	fetcher := &fakeFetcher{dataset: mixedDataset}
-	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile)
+	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile, nil)
 
 	getTrain(t, srv, "?end=2024-12-31")
 
@@ -255,7 +255,7 @@ func TestTrainHandler_InvalidStartDate_Returns400(t *testing.T) {
 	modelFile := filepath.Join(dir, "model.gob")
 	cls := buildTestClassifier(t, mixedDataset)
 	fetcher := &fakeFetcher{dataset: mixedDataset}
-	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile)
+	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile, nil)
 
 	resp := getTrain(t, srv, "?start=not-a-date")
 
@@ -267,7 +267,7 @@ func TestTrainHandler_InvalidEndDate_Returns400(t *testing.T) {
 	modelFile := filepath.Join(dir, "model.gob")
 	cls := buildTestClassifier(t, mixedDataset)
 	fetcher := &fakeFetcher{dataset: mixedDataset}
-	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile)
+	srv := handlers.NewServer(cls, &fakeUpdater{}, fetcher, modelFile, nil)
 
 	resp := getTrain(t, srv, "?end=not-a-date")
 

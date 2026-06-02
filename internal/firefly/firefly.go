@@ -3,8 +3,8 @@ package firefly
 import (
 	"bytes"
 	"encoding/json"
-	"ffiibtc/internal/classifier"
-	"ffiibtc/internal/config"
+	"ffiiibc/internal/classifier"
+	"ffiiibc/internal/config"
 	"fmt"
 	"net/http"
 	"time"
